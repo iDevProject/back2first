@@ -5,13 +5,21 @@
 #define ANIMATED YES
 
 static int lastIconListNumber=0;
+
+@interface SBIconController (add)
+-(BOOL)hasOpenFolder;
+@end
+
 %hook SBIconListPageControl
 - (void)setCurrentPageWithIconListNumber:(int)number 
 {
     %log;
-    if (lastIconListNumber == number) // stays on the same page
+    
+    id controller = [objc_getClass("SBIconController") sharedInstance];
+    
+    if (lastIconListNumber == number && ![controller hasOpenFolder])
     { 
-        UIScrollView *_scrVw = [[objc_getClass("SBIconController") sharedInstance] scrollView];
+        UIScrollView *_scrVw = [controller scrollView];
         
         int _n = (int)(_scrVw.contentSize.width / 320);
         
